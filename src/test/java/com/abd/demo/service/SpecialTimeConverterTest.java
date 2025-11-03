@@ -60,10 +60,33 @@ public class SpecialTimeConverterTest {
     }
 
     @Test
-    @DisplayName("Should convert 7:30 to 'thirty past seven'")
-    public void testConvertThirtyPastSeven() {
+    @DisplayName("Should convert 7:30 to 'half past seven'")
+    public void testConvertHalfPastSeven() {
         Time time = new Time(7, 30);
-        assertEquals("thirty past seven", converter.convert(time));
+        assertEquals("half past seven", converter.convert(time));
+    }
+
+    // Test quarter past (15 minutes)
+    @Test
+    @DisplayName("Should convert 4:15 to 'quarter past four'")
+    public void testConvertQuarterPastFour() {
+        Time time = new Time(4, 15);
+        assertEquals("quarter past four", converter.convert(time));
+    }
+
+    @Test
+    @DisplayName("Should convert 10:15 to 'quarter past ten'")
+    public void testConvertQuarterPastTen() {
+        Time time = new Time(10, 15);
+        assertEquals("quarter past ten", converter.convert(time));
+    }
+
+    // Test half past (30 minutes)
+    @Test
+    @DisplayName("Should convert 3:30 to 'half past three'")
+    public void testConvertHalfPastThree() {
+        Time time = new Time(3, 30);
+        assertEquals("half past three", converter.convert(time));
     }
 
     // Test "to" conversions (minutes 35-55)
@@ -89,10 +112,25 @@ public class SpecialTimeConverterTest {
     }
 
     @Test
-    @DisplayName("Should convert 16:45 to 'fifteen to seventeen'")
-    public void testConvertFifteenToSeventeen() {
+    @DisplayName("Should convert 16:45 to 'quarter to seventeen'")
+    public void testConvertQuarterToSeventeen() {
         Time time = new Time(16, 45);
-        assertEquals("fifteen to seventeen", converter.convert(time));
+        assertEquals("quarter to seventeen", converter.convert(time));
+    }
+
+    // Test quarter to (45 minutes)
+    @Test
+    @DisplayName("Should convert 9:45 to 'quarter to ten'")
+    public void testConvertQuarterToTen() {
+        Time time = new Time(9, 45);
+        assertEquals("quarter to ten", converter.convert(time));
+    }
+
+    @Test
+    @DisplayName("Should convert 23:45 to 'quarter to zero' (hour rollover)")
+    public void testConvertQuarterToZeroWithRollover() {
+        Time time = new Time(23, 45);
+        assertEquals("quarter to zero", converter.convert(time));
     }
 
     @Test
@@ -117,25 +155,39 @@ public class SpecialTimeConverterTest {
         assertEquals("twenty to zero", converter.convert(time));
     }
 
-    // Test on the hour (00 minutes)
+    // Test on the hour (00 minutes) - Special cases
     @Test
-    @DisplayName("Should convert 5:00 to 'five zero'")
-    public void testConvertFiveOClock() {
-        Time time = new Time(5, 0);
-        assertEquals("five zero", converter.convert(time));
-    }
-
-    @Test
-    @DisplayName("Should convert 12:00 to 'twelve zero'")
-    public void testConvertTwelveOClock() {
-        Time time = new Time(12, 0);
-        assertEquals("twelve zero", converter.convert(time));
-    }
-
-    @Test
-    @DisplayName("Should convert 0:00 to 'zero zero'")
+    @DisplayName("Should convert 0:00 to 'midnight'")
     public void testConvertMidnight() {
         Time time = new Time(0, 0);
-        assertEquals("zero zero", converter.convert(time));
+        assertEquals("midnight", converter.convert(time));
+    }
+
+    @Test
+    @DisplayName("Should convert 12:00 to 'noon'")
+    public void testConvertNoon() {
+        Time time = new Time(12, 0);
+        assertEquals("noon", converter.convert(time));
+    }
+
+    @Test
+    @DisplayName("Should convert 1:00 to 'one o'clock'")
+    public void testConvertOneOClock() {
+        Time time = new Time(1, 0);
+        assertEquals("one o'clock", converter.convert(time));
+    }
+
+    @Test
+    @DisplayName("Should convert 5:00 to 'five o'clock'")
+    public void testConvertFiveOClock() {
+        Time time = new Time(5, 0);
+        assertEquals("five o'clock", converter.convert(time));
+    }
+
+    @Test
+    @DisplayName("Should convert 23:00 to 'twenty three o'clock'")
+    public void testConvertTwentyThreeOClock() {
+        Time time = new Time(23, 0);
+        assertEquals("twenty three o'clock", converter.convert(time));
     }
 }

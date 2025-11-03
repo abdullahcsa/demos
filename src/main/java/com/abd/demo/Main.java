@@ -48,7 +48,7 @@ public class Main {
 
     private void printWelcomeMessage() {
         System.out.println("================================");
-        System.out.println("  Time to Words Converter");
+        System.out.println("  British Spoken Time Converter");
         System.out.println("================================");
         System.out.println("Enter time in format HH:MM or H:M");
         System.out.println("Time will be converted to words");
