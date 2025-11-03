@@ -74,12 +74,53 @@ public class TimeParserTest {
         assertEquals(30, time.getMinutes());
     }
 
+    // Tests for hour-only format (H or HH)
     @Test
-    @DisplayName("Should throw exception when no colon separator")
-    public void testParseInvalidFormatNoColon() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            parser.parse("1430");
-        });
+    @DisplayName("Should parse single digit hour (5 -> 5:00)")
+    public void testParseHourOnlySingleDigit() {
+        Time time = parser.parse("5");
+        assertEquals(5, time.getHours());
+        assertEquals(0, time.getMinutes());
+    }
+
+    @Test
+    @DisplayName("Should parse double digit hour (12 -> 12:00)")
+    public void testParseHourOnlyDoubleDigit() {
+        Time time = parser.parse("12");
+        assertEquals(12, time.getHours());
+        assertEquals(0, time.getMinutes());
+    }
+
+    @Test
+    @DisplayName("Should parse midnight hour only (0 -> 0:00)")
+    public void testParseHourOnlyMidnight() {
+        Time time = parser.parse("0");
+        assertEquals(0, time.getHours());
+        assertEquals(0, time.getMinutes());
+    }
+
+    @Test
+    @DisplayName("Should parse end of day hour only (23 -> 23:00)")
+    public void testParseHourOnlyEndOfDay() {
+        Time time = parser.parse("23");
+        assertEquals(23, time.getHours());
+        assertEquals(0, time.getMinutes());
+    }
+
+    @Test
+    @DisplayName("Should parse hour only with leading zero (09 -> 9:00)")
+    public void testParseHourOnlyWithLeadingZero() {
+        Time time = parser.parse("09");
+        assertEquals(9, time.getHours());
+        assertEquals(0, time.getMinutes());
+    }
+
+    @Test
+    @DisplayName("Should parse hour only with whitespace (  5  -> 5:00)")
+    public void testParseHourOnlyWithWhitespace() {
+        Time time = parser.parse("  5  ");
+        assertEquals(5, time.getHours());
+        assertEquals(0, time.getMinutes());
     }
 
     @Test
@@ -167,6 +208,31 @@ public class TimeParserTest {
     public void testParseInvalidFormatMissingHour() {
         assertThrows(IllegalArgumentException.class, () -> {
             parser.parse(":30");
+        });
+    }
+
+    // Validation tests for hour-only format
+    @Test
+    @DisplayName("Should throw exception for hour-only >= 24")
+    public void testParseHourOnlyInvalidTooLarge() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            parser.parse("24");
+        });
+    }
+
+    @Test
+    @DisplayName("Should throw exception for hour-only negative")
+    public void testParseHourOnlyInvalidNegative() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            parser.parse("-5");
+        });
+    }
+
+    @Test
+    @DisplayName("Should throw exception for hour-only non-numeric")
+    public void testParseHourOnlyInvalidLetters() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            parser.parse("abc");
         });
     }
 }

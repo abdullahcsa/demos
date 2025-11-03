@@ -4,7 +4,9 @@ import com.abd.demo.domain.Time;
 
 /**
  * Service for parsing time strings into Time value objects.
- * Accepts formats: "HH:MM" or "H:M"
+ * Accepts formats:
+ * - "HH:MM" or "H:M" (e.g., "07:30", "7:30")
+ * - "H" or "HH" (e.g., "5", "12") - treated as hour on the hour (minutes = 00)
  */
 public class TimeParser {
 
@@ -14,9 +16,22 @@ public class TimeParser {
         validateInput(input);
 
         String trimmed = input.trim();
-        validateFormat(trimmed);
 
-        String[] parts = trimmed.split(SEPARATOR);
+        // Check if input contains colon separator
+        if (trimmed.contains(SEPARATOR)) {
+            return parseWithMinutes(trimmed);
+        } else {
+            return parseHourOnly(trimmed);
+        }
+    }
+
+    /**
+     * Parses time in "HH:MM" or "H:M" format.
+     */
+    private Time parseWithMinutes(String input) {
+        validateFormat(input);
+
+        String[] parts = input.split(SEPARATOR);
         validateParts(parts);
 
         try {
@@ -28,6 +43,23 @@ public class TimeParser {
         }
     }
 
+    /**
+     * Parses time in "H" or "HH" format (hour only).
+     * Minutes default to 00.
+     */
+    private Time parseHourOnly(String input) {
+        if (input.isEmpty()) {
+            throw new IllegalArgumentException("Time input cannot be empty");
+        }
+
+        try {
+            int hours = Integer.parseInt(input);
+            return new Time(hours, 0);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid time format. Hour must be a number.");
+        }
+    }
+
     private void validateInput(String input) {
         if (input == null || input.trim().isEmpty()) {
             throw new IllegalArgumentException("Time input cannot be empty");
@@ -35,10 +67,6 @@ public class TimeParser {
     }
 
     private void validateFormat(String input) {
-        if (!input.contains(SEPARATOR)) {
-            throw new IllegalArgumentException("Invalid time format. Expected format: HH:MM or H:M");
-        }
-
         long colonCount = input.chars().filter(ch -> ch == ':').count();
         if (colonCount != 1) {
             throw new IllegalArgumentException("Invalid time format. Expected exactly one colon separator");
