@@ -2,19 +2,18 @@ package com.abd.demo;
 
 import com.abd.demo.domain.Time;
 import com.abd.demo.service.TimeParser;
-import com.abd.demo.service.TimeToWordsConverter;
-import com.abd.demo.service.GeneralTimeConverter;
+import com.abd.demo.service.TimeConverterService;
 import java.util.Scanner;
 
 public class Main {
     private static final String EXIT_COMMAND = "exit";
     private static final String HELP_COMMAND = "help";
     private final TimeParser timeParser;
-    private final TimeToWordsConverter timeConverter;
+    private final TimeConverterService timeConverterService;
 
     public Main() {
         this.timeParser = new TimeParser();
-        this.timeConverter = new GeneralTimeConverter();
+        this.timeConverterService = new TimeConverterService();
     }
 
     public static void main(String[] args) {
@@ -79,7 +78,7 @@ public class Main {
     private void parseAndDisplayTime(String input) {
         try {
             Time time = timeParser.parse(input);
-            String timeInWords = timeConverter.convert(time);
+            String timeInWords = timeConverterService.convert(time);
             System.out.println(timeInWords);
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
