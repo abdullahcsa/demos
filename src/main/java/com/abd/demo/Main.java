@@ -2,15 +2,19 @@ package com.abd.demo;
 
 import com.abd.demo.domain.Time;
 import com.abd.demo.service.TimeParser;
+import com.abd.demo.service.TimeToWordsConverter;
+import com.abd.demo.service.GeneralTimeConverter;
 import java.util.Scanner;
 
 public class Main {
     private static final String EXIT_COMMAND = "exit";
     private static final String HELP_COMMAND = "help";
     private final TimeParser timeParser;
+    private final TimeToWordsConverter timeConverter;
 
     public Main() {
         this.timeParser = new TimeParser();
+        this.timeConverter = new GeneralTimeConverter();
     }
 
     public static void main(String[] args) {
@@ -45,9 +49,10 @@ public class Main {
 
     private void printWelcomeMessage() {
         System.out.println("================================");
-        System.out.println("  Time Input Application");
+        System.out.println("  Time to Words Converter");
         System.out.println("================================");
         System.out.println("Enter time in format HH:MM or H:M");
+        System.out.println("Time will be converted to words");
         System.out.println("Type 'help' for available commands");
         System.out.println("Type 'q | exit' to quit");
         System.out.println();
@@ -74,20 +79,20 @@ public class Main {
     private void parseAndDisplayTime(String input) {
         try {
             Time time = timeParser.parse(input);
-            System.out.println(time.toString());
+            String timeInWords = timeConverter.convert(time);
+            System.out.println(timeInWords);
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
     private void printHelp() {
-        System.out.println("\nTime Input Application");
-        System.out.println("---------------------");
+        System.out.println("\nTime to Words Converter");
+        System.out.println("-----------------------");
         System.out.println("Enter time in format HH:MM or H:M");
+        System.out.println("Time will be converted to words");
         System.out.println("\nExamples:");
-        System.out.println("  14:30  -> 14:30");
-        System.out.println("  9:45   -> 09:45");
-        System.out.println("  0:00   -> 00:00");
+        System.out.println("  6:32   -> six thirty two");
         System.out.println("\nCommands:");
         System.out.println("  help  - Show this help message");
         System.out.println("  exit  - Exit the application");
