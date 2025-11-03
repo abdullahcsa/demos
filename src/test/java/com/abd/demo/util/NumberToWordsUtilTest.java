@@ -1,8 +1,10 @@
 package com.abd.demo.util;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("NumberToWordsUtil Tests")
 public class NumberToWordsUtilTest {
 
     @Test
