@@ -52,11 +52,11 @@ public class Main {
     }
 
     private Map<Predicate<String>, Consumer<String>> createCommandHandlers() {
-        return Map.of(
-            input -> exitCommands.contains(input.toLowerCase()), input -> {},
-            input -> "help".equalsIgnoreCase(input), input -> output.showHelp(),
-            input -> true, this::convertAndDisplay // default handler
-        );
+        Map<Predicate<String>, Consumer<String>> handlers = new LinkedHashMap<>();
+        handlers.put(input -> exitCommands.contains(input.toLowerCase()), input -> {});
+        handlers.put(input -> "help".equalsIgnoreCase(input), input -> output.showHelp());
+        handlers.put(input -> true, this::convertAndDisplay); // default handler - must be last
+        return handlers;
     }
 
     public void run() {

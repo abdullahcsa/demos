@@ -61,6 +61,29 @@ public class MainTest {
         assertNotNull(main);
     }
 
+    @Test
+    @DisplayName("Should show welcome, process commands, and exit")
+    public void testRunCompleteWorkflow() {
+        // Provide a dummy InputStream to prevent System.in from being closed
+        ByteArrayInputStream dummyInput = new ByteArrayInputStream("".getBytes());
+        System.setIn(dummyInput);
+
+        try {
+            testAdapter.setInputs("help", "14:30", "invalid", "3:15", "exit");
+            main.run();
+
+            assertTrue(testAdapter.welcomeCalled, "Welcome should be displayed");
+            assertTrue(testAdapter.helpCalled, "Help should be called");
+            assertTrue(testAdapter.exitCalled, "Exit should be called");
+            assertTrue(testAdapter.results.size() >= 2, "Should have results");
+            assertTrue(testAdapter.errors.size() >= 1, "Should have errors");
+            assertTrue(testAdapter.blankLineCalled, "Blank line should be called");
+        } finally {
+            // Restore System.in (although it's already closed, this is for clarity)
+            System.setIn(System.in);
+        }
+    }
+
     /**
      * Test OutputAdapter implementation that captures all method calls
      * for verification in tests.
