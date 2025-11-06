@@ -3,101 +3,103 @@ package com.abd.demo;
 import com.abd.demo.domain.Time;
 import com.abd.demo.service.TimeParser;
 import com.abd.demo.service.TimeConverterService;
-import java.util.Scanner;
+import com.abd.demo.adapter.ConsoleAdapter;
+import com.abd.demo.adapter.OutputAdapter;
 
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+/**
+ * Main application entry point.
+ * Orchestrates the CLI application using DDD Hexagonal Architecture:
+ *
+ * Layers:
+ * - Adapter Layer: OutputAdapter (port), ConsoleAdapter (adapter implementation)
+ * - Application Layer: TimeParser, TimeConverterService (application logic)
+ * - Domain Layer: Time (core business logic)
+ *
+ * Follows Dependency Inversion Principle - depends on OutputAdapter interface,
+ * not concrete implementation. This allows plugging in different adapters.
+ */
 public class Main {
-    private static final String EXIT_COMMAND = "exit";
-    private static final String HELP_COMMAND = "help";
     private final TimeParser timeParser;
     private final TimeConverterService timeConverterService;
+    private final OutputAdapter output;
+    private final Map<Predicate<String>, Consumer<String>> commandHandlers;
+    private final Set<String> exitCommands;
 
     public Main() {
+        this(new ConsoleAdapter());
+    }
+
+    /**
+     * Constructor with dependency injection.
+     * Accepts any OutputAdapter implementation (Console, Web, GUI, File, etc.)
+     *
+     * @param output the output adapter to use for UI operations
+     */
+    public Main(OutputAdapter output) {
         this.timeParser = new TimeParser();
         this.timeConverterService = new TimeConverterService();
+        this.output = output;
+        this.exitCommands = Set.of("exit", "quit", "q");
+        this.commandHandlers = createCommandHandlers();
     }
 
     public static void main(String[] args) {
-        Main app = new Main();
-        app.run();
+        new Main().run();
+    }
+
+    private Map<Predicate<String>, Consumer<String>> createCommandHandlers() {
+        return Map.of(
+            input -> exitCommands.contains(input.toLowerCase()), input -> {},
+            input -> "help".equalsIgnoreCase(input), input -> output.showHelp(),
+            input -> true, this::convertAndDisplay // default handler
+        );
     }
 
     public void run() {
-        Scanner scanner = new Scanner(System.in);
+        try (Scanner scanner = new Scanner(System.in)) {
+            output.showWelcome();
 
-        printWelcomeMessage();
+            while (true) {
+                String input = output.readInput(scanner);
 
-        while (true) {
-            System.out.print("> ");
-            String input = scanner.nextLine().trim();
+                if (input.isEmpty()) continue;
+                if (exitCommands.contains(input.toLowerCase())) {
+                    output.showExit();
+                    break;
+                }
 
-            if (input.isEmpty()) {
-                continue;
+                processCommand(input);
+                output.showBlankLine();
             }
-
-            if (shouldExit(input)) {
-                printExitMessage();
-                break;
-            }
-
-            processCommand(input);
-            System.out.println();
         }
-
-        scanner.close();
-    }
-
-    private void printWelcomeMessage() {
-        System.out.println("================================");
-        System.out.println("  British Spoken Time Converter");
-        System.out.println("================================");
-        System.out.println("Enter time in format HH:MM or H:M");
-        System.out.println("Time will be converted to words");
-        System.out.println("Type 'help' for available commands");
-        System.out.println("Type 'q | exit' to quit");
-        System.out.println();
-    }
-
-    private void printExitMessage() {
-        System.out.println("\nGoodbye!");
-    }
-
-    private boolean shouldExit(String input) {
-        return EXIT_COMMAND.equalsIgnoreCase(input) ||
-               "quit".equalsIgnoreCase(input) ||
-               "q".equalsIgnoreCase(input);
     }
 
     private void processCommand(String input) {
-        if (HELP_COMMAND.equalsIgnoreCase(input)) {
-            printHelp();
-        } else {
-            parseAndDisplayTime(input);
-        }
+        commandHandlers.entrySet().stream()
+            .filter(entry -> entry.getKey().test(input))
+            .findFirst()
+            .ifPresent(entry -> entry.getValue().accept(input));
     }
 
-    private void parseAndDisplayTime(String input) {
+    private void convertAndDisplay(String input) {
+        output.showResult(
+            parseTime(input)
+                .map(timeConverterService::convert)
+                .orElse(null)
+        );
+    }
+
+    private Optional<Time> parseTime(String input) {
         try {
-            Time time = timeParser.parse(input);
-            String timeInWords = timeConverterService.convert(time);
-            System.out.println(timeInWords);
+            return Optional.of(timeParser.parse(input));
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            output.showError(e.getMessage());
+            return Optional.empty();
         }
-    }
-
-    private void printHelp() {
-        System.out.println("\nTime to Words Converter");
-        System.out.println("-----------------------");
-        System.out.println("Enter time in format HH:MM or H:M");
-        System.out.println("Time will be converted to words");
-        System.out.println("\nExamples:");
-        System.out.println("  6:32   -> six thirty two");
-        System.out.println("\nCommands:");
-        System.out.println("  help  - Show this help message");
-        System.out.println("  exit  - Exit the application");
-        System.out.println("  quit  - Exit the application");
-        System.out.println("  q     - Exit the application");
-        System.out.println();
     }
 
     public static String getMessage() {

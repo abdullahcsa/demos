@@ -53,10 +53,10 @@ public class BritishTimeConverterTest {
     }
 
     @Test
-    @DisplayName("Should convert 14:20 to 'twenty past fourteen'")
+    @DisplayName("Should convert 14:20 to 'twenty past two'")
     public void testConvertTwentyPastFourteen() {
         Time time = new Time(14, 20);
-        assertEquals("twenty past fourteen", converter.convert(time));
+        assertEquals("twenty past two", converter.convert(time));
     }
 
     @Test
@@ -112,10 +112,10 @@ public class BritishTimeConverterTest {
     }
 
     @Test
-    @DisplayName("Should convert 16:45 to 'quarter to seventeen'")
+    @DisplayName("Should convert 16:45 to 'quarter to five'")
     public void testConvertQuarterToSeventeen() {
         Time time = new Time(16, 45);
-        assertEquals("quarter to seventeen", converter.convert(time));
+        assertEquals("quarter to five", converter.convert(time));
     }
 
     // Test quarter to (45 minutes)
@@ -134,10 +134,10 @@ public class BritishTimeConverterTest {
     }
 
     @Test
-    @DisplayName("Should convert 19:50 to 'ten to twenty'")
+    @DisplayName("Should convert 19:50 to 'ten to eight'")
     public void testConvertTenToTwenty() {
         Time time = new Time(19, 50);
-        assertEquals("ten to twenty", converter.convert(time));
+        assertEquals("ten to eight", converter.convert(time));
     }
 
     // Test edge cases with hour rollover
@@ -185,9 +185,9 @@ public class BritishTimeConverterTest {
     }
 
     @Test
-    @DisplayName("Should convert 23:00 to 'twenty three o'clock'")
+    @DisplayName("Should convert 23:00 to 'eleven o'clock'")
     public void testConvertTwentyThreeOClock() {
         Time time = new Time(23, 0);
-        assertEquals("twenty three o'clock", converter.convert(time));
+        assertEquals("eleven o'clock", converter.convert(time));
     }
 }

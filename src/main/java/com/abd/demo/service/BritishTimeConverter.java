@@ -116,17 +116,27 @@ public class BritishTimeConverter implements TimeToWordsConverter {
 
     /**
      * Converts the hour component of time to words.
+     * Converts from 24-hour to 12-hour format.
      */
     private String getHourInWords(Time time) {
-        return NumberToWordsUtil.convert(time.getHours());
+        return NumberToWordsUtil.convert(to12HourFormat(time.getHours()));
     }
 
     /**
      * Converts the next hour to words (with rollover at midnight).
+     * Converts from 24-hour to 12-hour format.
      */
     private String getNextHourInWords(Time time) {
         int nextHour = (time.getHours() + 1) % HOURS_IN_DAY;
-        return NumberToWordsUtil.convert(nextHour);
+        return NumberToWordsUtil.convert(to12HourFormat(nextHour));
+    }
+
+    /**
+     * Converts 24-hour format to 12-hour format.
+     * 0 stays 0 (for midnight), 12 stays 12 (for noon), 13-23 become 1-11.
+     */
+    private int to12HourFormat(int hour24) {
+        return hour24 == 0 || hour24 == 12 ? hour24 : hour24 % 12;
     }
 
     /**
