@@ -7,11 +7,11 @@ import com.abd.demo.domain.Time;
  * Uses Chain of Responsibility pattern to select the appropriate converter.
  *
  * Supports multiple conversion styles:
- * - British (default): Uses BritishTimeConverter for British English phrases
+ * - British (default): Uses BritishTimeConverterFunctional for British English phrases
  * - Other converters can be passed as arguments
  *
  * Conversion strategies (in order of precedence):
- * 1. BritishTimeConverter - for multiples of 5 (uses "past" and "to" format, British phrases)
+ * 1. BritishTimeConverterFunctional - for multiples of 5 (uses "past" and "to" format, British phrases)
  * 2. GeneralTimeConverter - fallback for all other times
  *
  * This design allows easy addition of more converters in the future.
@@ -43,7 +43,7 @@ public class TimeConverterService {
      * Allows custom converters to be used instead of the default British converter.
      *
      * @param time the time to convert
-     * @param specialConverter the converter to use for special cases (e.g., BritishTimeConverter)
+     * @param specialConverter the converter to use for special cases (e.g., BritishTimeConverterFunctional)
      * @return the time in words using the specified converter
      * @throws IllegalArgumentException if time is null
      */

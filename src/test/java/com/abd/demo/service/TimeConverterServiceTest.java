@@ -10,30 +10,30 @@ public class TimeConverterServiceTest {
 
     private final TimeConverterService service = new TimeConverterService();
 
-    // Test special cases (multiples of 5) - Uses BritishTimeConverter by default
+    // Test special cases (multiples of 5) - Uses BritishTimeConverterFunctional by default
     @Test
-    @DisplayName("Should use BritishTimeConverter for 2:05")
+    @DisplayName("Should use BritishTimeConverterFunctional for 2:05")
     public void testBritishConverterForFivePastTwo() {
         Time time = new Time(2, 5);
         assertEquals("five past two", service.convert(time));
     }
 
     @Test
-    @DisplayName("Should use BritishTimeConverter for 6:25")
+    @DisplayName("Should use BritishTimeConverterFunctional for 6:25")
     public void testBritishConverterForTwentyFivePastSix() {
         Time time = new Time(6, 25);
         assertEquals("twenty five past six", service.convert(time));
     }
 
     @Test
-    @DisplayName("Should use BritishTimeConverter for 8:40")
+    @DisplayName("Should use BritishTimeConverterFunctional for 8:40")
     public void testBritishConverterForTwentyToNine() {
         Time time = new Time(8, 40);
         assertEquals("twenty to nine", service.convert(time));
     }
 
     @Test
-    @DisplayName("Should use BritishTimeConverter for 11:55")
+    @DisplayName("Should use BritishTimeConverterFunctional for 11:55")
     public void testBritishConverterForFiveToTwelve() {
         Time time = new Time(11, 55);
         assertEquals("five to twelve", service.convert(time));

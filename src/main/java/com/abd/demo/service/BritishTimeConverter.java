@@ -3,20 +3,20 @@ package com.abd.demo.service;
 import com.abd.demo.domain.Time;
 import com.abd.demo.util.NumberToWordsUtil;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * British English time converter for times with minutes divisible by 5.
  * Handles British-specific phrases like "quarter past", "half past", "midnight", "noon", "o'clock".
  *
- * Uses a hybrid approach:
+ * Fully functional approach using strategy pattern:
  * - Map-based handlers for special minute values (0, 15, 30, 45, etc.)
- * - Generic handlers for "past" and "to" patterns
+ * - Chain of responsibility for hour-based special cases (midnight, noon)
+ * - Predicate-based selection for "past" vs "to" patterns
  *
- * To add new special cases, simply add entries to the minuteHandlers map.
- * No modification to the convert() method needed.
+ * No if-else statements - pure functional composition.
  */
 public class BritishTimeConverter implements TimeToWordsConverter {
 
@@ -42,40 +42,53 @@ public class BritishTimeConverter implements TimeToWordsConverter {
     // Special handlers for specific minute values
     private final Map<Integer, Function<Time, String>> minuteHandlers;
 
+    // Hour-based special cases (chain of responsibility)
+    private final List<ConditionalHandler> hourHandlers;
+
+    // Generic minute handlers (past vs to)
+    private final List<ConditionalHandler> genericHandlers;
+
     public BritishTimeConverter() {
         this.minuteHandlers = new HashMap<>();
-        initializeMinuteHandlers();
+        this.hourHandlers = new ArrayList<>();
+        this.genericHandlers = new ArrayList<>();
+        initializeHandlers();
     }
 
     /**
-     * Initialize special handlers for specific minute values.
-     * Add new special cases here without modifying convert() method.
+     * Initialize all handlers using functional approach.
+     * No if-else statements - just declarative configuration.
      */
-    private void initializeMinuteHandlers() {
-        // On the hour - special handling for midnight, noon, and o'clock
-        minuteHandlers.put(0, time -> {
-            int hour = time.getHours();
-            if (hour == MIDNIGHT_HOUR) {
-                return MIDNIGHT;
-            } else if (hour == NOON_HOUR) {
-                return NOON;
-            } else {
-                return getHourInWords(time) + O_CLOCK;
-            }
-        });
+    private void initializeHandlers() {
+        // Hour-based handlers for minute=0 (chain of responsibility)
+        hourHandlers.add(new ConditionalHandler(
+            time -> time.getHours() == MIDNIGHT_HOUR,
+            time -> MIDNIGHT
+        ));
+        hourHandlers.add(new ConditionalHandler(
+            time -> time.getHours() == NOON_HOUR,
+            time -> NOON
+        ));
+        hourHandlers.add(new ConditionalHandler(
+            time -> true, // default case
+            time -> getHourInWords(time) + O_CLOCK
+        ));
 
-        // Quarter past
+        // Special minute handlers
+        minuteHandlers.put(0, time -> applyFirstMatching(hourHandlers, time));
         minuteHandlers.put(15, time -> QUARTER_PAST + getHourInWords(time));
-
-        // Half past
         minuteHandlers.put(30, time -> HALF_PAST + getHourInWords(time));
-
-        // Quarter to
         minuteHandlers.put(45, time -> QUARTER_TO + getNextHourInWords(time));
 
-        // Future special cases can be added here, for example:
-        // minuteHandlers.put(20, time -> "twenty" + PAST + getHourInWords(time));
-        // minuteHandlers.put(40, time -> "twenty" + TO + getNextHourInWords(time));
+        // Generic handlers for "past" and "to" patterns
+        genericHandlers.add(new ConditionalHandler(
+            time -> time.getMinutes() < HALF_HOUR,
+            time -> getMinutesInWords(time) + PAST + getHourInWords(time)
+        ));
+        genericHandlers.add(new ConditionalHandler(
+            time -> true, // default case (minutes >= HALF_HOUR)
+            time -> getMinutesToNextHourInWords(time) + TO + getNextHourInWords(time)
+        ));
     }
 
     @Override
@@ -85,32 +98,42 @@ public class BritishTimeConverter implements TimeToWordsConverter {
 
     @Override
     public String convert(Time time) {
-        int minutes = time.getMinutes();
-
-        // Check if there's a special handler for this minute value
-        if (minuteHandlers.containsKey(minutes)) {
-            return minuteHandlers.get(minutes).apply(time);
-        }
-
-        // Fall back to generic "past" or "to" conversion
-        return convertWithPastOrTo(time);
+        return Optional.ofNullable(minuteHandlers.get(time.getMinutes()))
+            .map(handler -> handler.apply(time))
+            .orElseGet(() -> applyFirstMatching(genericHandlers, time));
     }
 
     /**
-     * Generic conversion for "past" (1-30) or "to" (31-59) patterns.
-     * This method handles all cases not covered by special handlers.
+     * Apply the first matching conditional handler from the list.
+     * Implements chain of responsibility pattern functionally.
      */
-    private String convertWithPastOrTo(Time time) {
-        int minutes = time.getMinutes();
+    private String applyFirstMatching(List<ConditionalHandler> handlers, Time time) {
+        return handlers.stream()
+            .filter(handler -> handler.test(time))
+            .findFirst()
+            .map(handler -> handler.apply(time))
+            .orElseThrow(() -> new IllegalStateException("No handler matched"));
+    }
 
-        if (minutes < HALF_HOUR) {
-            // Past pattern
-            String minutesInWords = getMinutesInWords(time);
-            return minutesInWords + PAST + getHourInWords(time);
-        } else {
-            // To pattern
-            String minutesInWords = getMinutesToNextHourInWords(time);
-            return minutesInWords + TO + getNextHourInWords(time);
+    /**
+     * Conditional handler combining predicate and function.
+     * Enables chain of responsibility without if-else.
+     */
+    private static class ConditionalHandler {
+        private final Predicate<Time> condition;
+        private final Function<Time, String> handler;
+
+        ConditionalHandler(Predicate<Time> condition, Function<Time, String> handler) {
+            this.condition = condition;
+            this.handler = handler;
+        }
+
+        boolean test(Time time) {
+            return condition.test(time);
+        }
+
+        String apply(Time time) {
+            return handler.apply(time);
         }
     }
 

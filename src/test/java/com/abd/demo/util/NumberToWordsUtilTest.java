@@ -4,8 +4,37 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 @DisplayName("NumberToWordsUtil Tests")
 public class NumberToWordsUtilTest {
+
+    @Test
+    @DisplayName("Should throw exception when trying to instantiate utility class")
+    public void testUtilityClassConstructor() {
+        assertThrows(InvocationTargetException.class, () -> {
+            Constructor<NumberToWordsUtil> constructor = NumberToWordsUtil.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            constructor.newInstance();
+        });
+    }
+
+    @Test
+    @DisplayName("Utility class constructor should throw IllegalStateException")
+    public void testUtilityClassConstructorThrowsIllegalStateException() {
+        try {
+            Constructor<NumberToWordsUtil> constructor = NumberToWordsUtil.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            constructor.newInstance();
+            fail("Should have thrown exception");
+        } catch (InvocationTargetException e) {
+            assertTrue(e.getCause() instanceof IllegalStateException);
+            assertEquals("Utility class", e.getCause().getMessage());
+        } catch (Exception e) {
+            fail("Unexpected exception type: " + e.getClass().getName());
+        }
+    }
 
     @Test
     public void testConvertZero() {
