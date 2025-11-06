@@ -71,29 +71,5 @@ jobs:
           echo "SonarQube scan skipped - SONAR_TOKEN or SONAR_HOST_URL not set"
         fi
 
-    - name: Publish test results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
-      with:
-        files: |
-          target/surefire-reports/*.xml
-
-    - name: Upload test coverage artifacts
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: coverage-report
-        path: target/site/jacoco/
-
     - name: Check code coverage threshold
-      run: |
-        mvn -B jacoco:check -Djacoco.haltOnFailure=false || echo "Coverage threshold not met"
-
-    - name: Comment PR with coverage
-      if: github.event_name == 'pull_request'
-      uses: madrapps/jacoco-report@v1.6.1
-      with:
-        paths: target/site/jacoco/jacoco.xml
-        token: ${{ secrets.GITHUB_TOKEN }}
-        min-coverage-overall: 80
-        min-coverage-changed-files: 80
+      run: mvn -B verify
