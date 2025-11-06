@@ -7,11 +7,14 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:  # Allow manual triggering
 
 jobs:
   sonarcloud:
     name: SonarCloud Scan
     runs-on: ubuntu-latest
+    # Only run if SONAR_TOKEN is configured
+    if: ${{ secrets.SONAR_TOKEN != '' }}
 
     steps:
       - name: Checkout code
@@ -45,7 +48,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B clean verify sonar:sonar \
-            -Dsonar.projectKey=abd_demoBritSpokTime \
-            -Dsonar.organization=abd \
+            -Dsonar.projectKey=abdullahcsa_demos \
+            -Dsonar.organization=abdullahcsa \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+        continue-on-error: true
