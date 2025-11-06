@@ -1,0 +1,14 @@
+# Code owners for this repository
+# These owners will be requested for review when someone opens a pull request
+
+# Default owners for everything in the repo
+* @abd
+
+# Domain layer - requires careful review
+/src/main/java/com/abd/demo/domain/ @abd
+
+# Service layer
+/src/main/java/com/abd/demo/service/ @abd
+
+# GitHub workflows
+/.github/ @abd
