@@ -60,6 +60,16 @@ public class ConsoleAdapter implements OutputAdapter {
     }
 
     @Override
+    public void showSuccess(String message) {
+        write(messages.formatSuccess(message));
+    }
+
+    @Override
+    public void showInfo(String message) {
+        write(messages.formatInfo(message));
+    }
+
+    @Override
     public void showBlankLine() {
         write(messages.getBlank());
     }

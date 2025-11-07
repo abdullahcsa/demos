@@ -131,6 +131,16 @@ public class MainTest {
         }
 
         @Override
+        public void showSuccess(String message) {
+            // Capture success messages if needed for tests
+        }
+
+        @Override
+        public void showInfo(String message) {
+            // Capture info messages if needed for tests
+        }
+
+        @Override
         public void showBlankLine() {
             blankLineCalled = true;
         }

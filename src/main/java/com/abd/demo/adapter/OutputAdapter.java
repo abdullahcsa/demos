@@ -46,6 +46,18 @@ public interface OutputAdapter {
     void showError(String error);
 
     /**
+     * Display success message.
+     * @param message the success message
+     */
+    void showSuccess(String message);
+
+    /**
+     * Display informational message.
+     * @param message the info message
+     */
+    void showInfo(String message);
+
+    /**
      * Display blank line or separator.
      */
     void showBlankLine();

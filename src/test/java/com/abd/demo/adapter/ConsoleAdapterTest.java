@@ -42,8 +42,9 @@ class ConsoleAdapterTest {
 
         String output = adapter.getLastOutput();
         assertTrue(output.contains("Time to Words Converter"));
-        assertTrue(output.contains("help  - Show this help message"));
-        assertTrue(output.contains("exit  - Exit the application"));
+        assertTrue(output.contains("help") && output.contains("Show this help message"));
+        assertTrue(output.contains("exit") && output.contains("Exit the application"));
+        assertTrue(output.contains("config") && output.contains("Show current configuration"));
     }
 
     @Test

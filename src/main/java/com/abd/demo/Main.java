@@ -3,6 +3,7 @@ package com.abd.demo;
 import com.abd.demo.adapter.ConsoleAdapter;
 import com.abd.demo.adapter.OutputAdapter;
 import com.abd.demo.command.*;
+import com.abd.demo.config.LoggerConfigUtil;
 import com.abd.demo.service.TimeConverterService;
 import com.abd.demo.service.TimeParser;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,9 @@ public class Main {
      * @param output the output adapter to use for UI operations
      */
     public Main(OutputAdapter output) {
+        // Initialize console logging (disabled by default)
+        LoggerConfigUtil.initializeConsoleLogging();
+
         log.info("Initializing British Spoken Time application");
         this.output = output;
         this.commands = createCommands();
@@ -56,6 +60,7 @@ public class Main {
         return List.of(
             new ExitCommand(output),
             new HelpCommand(output),
+            new ConfigCommand(output),
             new TimeConversionCommand(timeParser, timeConverterService, output)
         ).stream()
          .sorted(Comparator.comparingInt(Command::getPriority))

@@ -40,10 +40,11 @@ class MessagesTest {
         assertTrue(help.contains("Examples:"));
         assertTrue(help.contains("6:32   -> six thirty two"));
         assertTrue(help.contains("Commands:"));
-        assertTrue(help.contains("help  - Show this help message"));
-        assertTrue(help.contains("exit  - Exit the application"));
-        assertTrue(help.contains("quit  - Exit the application"));
-        assertTrue(help.contains("q     - Exit the application"));
+        assertTrue(help.contains("help") && help.contains("Show this help message"));
+        assertTrue(help.contains("config") && help.contains("Show current configuration"));
+        assertTrue(help.contains("exit") && help.contains("Exit the application"));
+        assertTrue(help.contains("quit") && help.contains("Exit the application"));
+        assertTrue(help.contains("q") && help.contains("Exit the application"));
     }
 
     @Test
