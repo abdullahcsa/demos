@@ -1,6 +1,8 @@
 package com.abd.demo.service;
 
 import com.abd.demo.domain.Time;
+import com.abd.demo.domain.exceptions.InvalidTimeException;
+import com.abd.demo.domain.exceptions.InvalidTimeFormatException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
@@ -126,7 +128,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception for multiple colons")
     public void testParseInvalidFormatMultipleColons() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeFormatException.class, () -> {
             parser.parse("14:30:00");
         });
     }
@@ -134,7 +136,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception for non-numeric input")
     public void testParseInvalidFormatLetters() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeFormatException.class, () -> {
             parser.parse("ab:cd");
         });
     }
@@ -142,7 +144,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception for empty input")
     public void testParseInvalidFormatEmpty() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeFormatException.class, () -> {
             parser.parse("");
         });
     }
@@ -150,7 +152,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception for null input")
     public void testParseInvalidFormatNull() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeFormatException.class, () -> {
             parser.parse(null);
         });
     }
@@ -158,7 +160,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception for hour >= 24")
     public void testParseInvalidHourTooLarge() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeException.class, () -> {
             parser.parse("24:30");
         });
     }
@@ -166,7 +168,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception for minute >= 60")
     public void testParseInvalidMinuteTooLarge() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeException.class, () -> {
             parser.parse("14:60");
         });
     }
@@ -174,7 +176,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception for negative hour")
     public void testParseInvalidNegativeHour() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeException.class, () -> {
             parser.parse("-1:30");
         });
     }
@@ -182,7 +184,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception for negative minute")
     public void testParseInvalidNegativeMinute() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeException.class, () -> {
             parser.parse("14:-5");
         });
     }
@@ -190,7 +192,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception for only colon")
     public void testParseInvalidFormatOnlyColon() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeFormatException.class, () -> {
             parser.parse(":");
         });
     }
@@ -198,7 +200,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception when missing minute")
     public void testParseInvalidFormatMissingMinute() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeFormatException.class, () -> {
             parser.parse("14:");
         });
     }
@@ -206,7 +208,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception when missing hour")
     public void testParseInvalidFormatMissingHour() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeFormatException.class, () -> {
             parser.parse(":30");
         });
     }
@@ -215,7 +217,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception for hour-only >= 24")
     public void testParseHourOnlyInvalidTooLarge() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeException.class, () -> {
             parser.parse("24");
         });
     }
@@ -223,7 +225,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception for hour-only negative")
     public void testParseHourOnlyInvalidNegative() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeException.class, () -> {
             parser.parse("-5");
         });
     }
@@ -231,7 +233,7 @@ public class TimeParserTest {
     @Test
     @DisplayName("Should throw exception for hour-only non-numeric")
     public void testParseHourOnlyInvalidLetters() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeFormatException.class, () -> {
             parser.parse("abc");
         });
     }

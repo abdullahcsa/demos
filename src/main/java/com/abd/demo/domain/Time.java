@@ -1,5 +1,7 @@
 package com.abd.demo.domain;
 
+import com.abd.demo.domain.exceptions.InvalidTimeException;
+
 import java.util.Objects;
 
 /**
@@ -24,7 +26,7 @@ public final class Time {
 
     private void validateHours(int hours) {
         if (hours < MIN_HOURS || hours > MAX_HOURS) {
-            throw new IllegalArgumentException(
+            throw new InvalidTimeException(
                 String.format("Hours must be between %d and %d, got: %d",
                     MIN_HOURS, MAX_HOURS, hours)
             );
@@ -33,7 +35,7 @@ public final class Time {
 
     private void validateMinutes(int minutes) {
         if (minutes < MIN_MINUTES || minutes > MAX_MINUTES) {
-            throw new IllegalArgumentException(
+            throw new InvalidTimeException(
                 String.format("Minutes must be between %d and %d, got: %d",
                     MIN_MINUTES, MAX_MINUTES, minutes)
             );

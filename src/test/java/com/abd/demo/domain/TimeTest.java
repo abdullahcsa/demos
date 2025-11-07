@@ -1,5 +1,6 @@
 package com.abd.demo.domain;
 
+import com.abd.demo.domain.exceptions.InvalidTimeException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,7 +43,7 @@ public class TimeTest {
     @Test
     @DisplayName("Should throw exception for negative hour")
     public void testInvalidHourNegative() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeException.class, () -> {
             new Time(-1, 30);
         });
     }
@@ -50,7 +51,7 @@ public class TimeTest {
     @Test
     @DisplayName("Should throw exception for hour >= 24")
     public void testInvalidHourTooLarge() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeException.class, () -> {
             new Time(24, 30);
         });
     }
@@ -58,7 +59,7 @@ public class TimeTest {
     @Test
     @DisplayName("Should throw exception for negative minute")
     public void testInvalidMinuteNegative() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeException.class, () -> {
             new Time(14, -1);
         });
     }
@@ -66,7 +67,7 @@ public class TimeTest {
     @Test
     @DisplayName("Should throw exception for minute >= 60")
     public void testInvalidMinuteTooLarge() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidTimeException.class, () -> {
             new Time(14, 60);
         });
     }

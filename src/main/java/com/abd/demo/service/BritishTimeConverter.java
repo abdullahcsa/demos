@@ -1,6 +1,7 @@
 package com.abd.demo.service;
 
 import com.abd.demo.domain.Time;
+import com.abd.demo.domain.exceptions.TimeConversionException;
 import com.abd.demo.service.rule.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,7 +75,7 @@ public class BritishTimeConverter implements TimeToWordsConverter {
             })
             .orElseThrow(() -> {
                 log.error("No rule matched for time: {}", time);
-                return new IllegalStateException("No rule matched for time: " + time);
+                return new TimeConversionException("No rule matched for time: " + time);
             });
     }
 }

@@ -60,7 +60,7 @@ public class TimeConversionCommand implements Command {
             Time time = timeParser.parse(input);
             log.debug("Successfully parsed time: {}", time);
             return Optional.of(time);
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
             log.error("Failed to parse time input '{}': {}", input, e.getMessage());
             output.showError(e.getMessage());
             return Optional.empty();

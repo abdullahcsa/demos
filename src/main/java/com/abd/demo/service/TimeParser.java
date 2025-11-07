@@ -1,6 +1,7 @@
 package com.abd.demo.service;
 
 import com.abd.demo.domain.Time;
+import com.abd.demo.domain.exceptions.InvalidTimeFormatException;
 
 /**
  * Service for parsing time strings into Time value objects.
@@ -39,7 +40,7 @@ public class TimeParser {
             int minutes = Integer.parseInt(parts[1]);
             return new Time(hours, minutes);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid time format. Hours and minutes must be numbers.");
+            throw new InvalidTimeFormatException("Invalid time format. Hours and minutes must be numbers.", e);
         }
     }
 
@@ -49,37 +50,37 @@ public class TimeParser {
      */
     private Time parseHourOnly(String input) {
         if (input.isEmpty()) {
-            throw new IllegalArgumentException("Time input cannot be empty");
+            throw new InvalidTimeFormatException("Time input cannot be empty");
         }
 
         try {
             int hours = Integer.parseInt(input);
             return new Time(hours, 0);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid time format. Hour must be a number.");
+            throw new InvalidTimeFormatException("Invalid time format. Hour must be a number.", e);
         }
     }
 
     private void validateInput(String input) {
         if (input == null || input.trim().isEmpty()) {
-            throw new IllegalArgumentException("Time input cannot be empty");
+            throw new InvalidTimeFormatException("Time input cannot be empty");
         }
     }
 
     private void validateFormat(String input) {
         long colonCount = input.chars().filter(ch -> ch == ':').count();
         if (colonCount != 1) {
-            throw new IllegalArgumentException("Invalid time format. Expected exactly one colon separator");
+            throw new InvalidTimeFormatException("Invalid time format. Expected exactly one colon separator");
         }
     }
 
     private void validateParts(String[] parts) {
         if (parts.length != 2) {
-            throw new IllegalArgumentException("Invalid time format. Expected format: HH:MM or H:M");
+            throw new InvalidTimeFormatException("Invalid time format. Expected format: HH:MM or H:M");
         }
 
         if (parts[0].isEmpty() || parts[1].isEmpty()) {
-            throw new IllegalArgumentException("Invalid time format. Both hours and minutes are required");
+            throw new InvalidTimeFormatException("Invalid time format. Both hours and minutes are required");
         }
     }
 }
