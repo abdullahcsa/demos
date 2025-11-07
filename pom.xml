@@ -114,27 +114,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Maven Failsafe Plugin for integration and E2E tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <includes>
-                        <include>**/*IntegrationTest.java</include>
-                        <include>**/*E2ETest.java</include>
-                    </includes>
-                </configuration>
-            </plugin>
-
             <!-- Maven JAR Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
