@@ -1,10 +1,14 @@
 package com.abd.demo.e2e;
 
+import ch.qos.logback.classic.LoggerContext;
 import com.abd.demo.Main;
 import com.abd.demo.adapter.OutputAdapter;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -18,6 +22,23 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @DisplayName("Application End-to-End Tests")
 class ApplicationE2ETest {
+    private final PrintStream originalOut = System.out;
+    private final PrintStream originalErr = System.err;
+    private final InputStream originalIn = System.in;
+
+    @AfterEach
+    void tearDown() {
+        // restore standard streams if any test replaced them
+        System.setOut(originalOut);
+        System.setErr(originalErr);
+        System.setIn(originalIn);
+
+        // if your application manipulates Logback appenders, reset the context
+        // (only needed if Main modifies logging configuration)
+        LoggerContext lc = (LoggerContext) org.slf4j.LoggerFactory.getILoggerFactory();
+        lc.reset(); // restores logger context to default state
+    }
+
 
     @Test
     @DisplayName("E2E: Complete user session with help, time conversions, and exit")
@@ -66,12 +87,12 @@ class ApplicationE2ETest {
     void shouldHandleMultipleTimeConversions() {
         TestOutputAdapter adapter = new TestOutputAdapter();
         adapter.setInputs(
-            "00:00",  // midnight
-            "12:00",  // noon
-            "3:15",   // quarter past three
-            "8:45",   // quarter to nine
-            "14:30",  // half past two
-            "exit"
+                "00:00",  // midnight
+                "12:00",  // noon
+                "3:15",   // quarter past three
+                "8:45",   // quarter to nine
+                "14:30",  // half past two
+                "exit"
         );
 
         Main app = new Main(adapter);
@@ -90,12 +111,12 @@ class ApplicationE2ETest {
     void shouldHandleConfigurationChanges() {
         TestOutputAdapter adapter = new TestOutputAdapter();
         adapter.setInputs(
-            "config",                 // Show current config
-            "config logs enable",     // Enable logs
-            "12:00",                  // Convert time
-            "config logs disable",    // Disable logs
-            "14:30",                  // Convert time again
-            "exit"
+                "config",                 // Show current config
+                "config logs enable",     // Enable logs
+                "12:00",                  // Convert time
+                "config logs disable",    // Disable logs
+                "14:30",                  // Convert time again
+                "exit"
         );
 
         Main app = new Main(adapter);
@@ -129,9 +150,9 @@ class ApplicationE2ETest {
     void shouldHandleCommandsCaseInsensitive() {
         TestOutputAdapter adapter = new TestOutputAdapter();
         adapter.setInputs(
-            "HELP",
-            "CONFIG LOGS ENABLE",
-            "EXIT"
+                "HELP",
+                "CONFIG LOGS ENABLE",
+                "EXIT"
         );
 
         Main app = new Main(adapter);
@@ -162,12 +183,12 @@ class ApplicationE2ETest {
     void shouldHandleMixedInputs() {
         TestOutputAdapter adapter = new TestOutputAdapter();
         adapter.setInputs(
-            "12:00",      // valid
-            "invalid",    // invalid
-            "14:30",      // valid
-            "99:99",      // invalid
-            "8:45",       // valid
-            "exit"
+                "12:00",      // valid
+                "invalid",    // invalid
+                "14:30",      // valid
+                "99:99",      // invalid
+                "8:45",       // valid
+                "exit"
         );
 
         Main app = new Main(adapter);
