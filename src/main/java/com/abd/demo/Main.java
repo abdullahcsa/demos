@@ -1,33 +1,30 @@
 package com.abd.demo;
 
-import com.abd.demo.domain.Time;
-import com.abd.demo.service.TimeParser;
-import com.abd.demo.service.TimeConverterService;
 import com.abd.demo.adapter.ConsoleAdapter;
 import com.abd.demo.adapter.OutputAdapter;
+import com.abd.demo.command.*;
+import com.abd.demo.service.TimeConverterService;
+import com.abd.demo.service.TimeParser;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Main application entry point.
- * Orchestrates the CLI application using DDD Hexagonal Architecture:
+ * Orchestrates the CLI application using DDD Hexagonal Architecture + Strategy Pattern.
  *
  * Layers:
  * - Adapter Layer: OutputAdapter (port), ConsoleAdapter (adapter implementation)
- * - Application Layer: TimeParser, TimeConverterService (application logic)
+ * - Application Layer: Command implementations (application services)
  * - Domain Layer: Time (core business logic)
  *
- * Follows Dependency Inversion Principle - depends on OutputAdapter interface,
- * not concrete implementation. This allows plugging in different adapters.
+ * Follows Open/Closed Principle - new commands can be added without modifying this class.
  */
+@Slf4j
 public class Main {
-    private final TimeParser timeParser;
-    private final TimeConverterService timeConverterService;
     private final OutputAdapter output;
-    private final Map<Predicate<String>, Consumer<String>> commandHandlers;
-    private final Set<String> exitCommands;
+    private final List<Command> commands;
 
     public Main() {
         this(new ConsoleAdapter());
@@ -40,66 +37,71 @@ public class Main {
      * @param output the output adapter to use for UI operations
      */
     public Main(OutputAdapter output) {
-        this.timeParser = new TimeParser();
-        this.timeConverterService = new TimeConverterService();
+        log.info("Initializing British Spoken Time application");
         this.output = output;
-        this.exitCommands = Set.of("exit", "quit", "q");
-        this.commandHandlers = createCommandHandlers();
+        this.commands = createCommands();
+        log.debug("Loaded {} commands", commands.size());
     }
 
     public static void main(String[] args) {
+        log.info("Starting British Spoken Time Converter application");
         new Main().run();
+        log.info("Application terminated");
     }
 
-    private Map<Predicate<String>, Consumer<String>> createCommandHandlers() {
-        Map<Predicate<String>, Consumer<String>> handlers = new LinkedHashMap<>();
-        handlers.put(input -> exitCommands.contains(input.toLowerCase()), input -> {});
-        handlers.put(input -> "help".equalsIgnoreCase(input), input -> output.showHelp());
-        handlers.put(input -> true, this::convertAndDisplay); // default handler - must be last
-        return handlers;
+    private List<Command> createCommands() {
+        TimeParser timeParser = new TimeParser();
+        TimeConverterService timeConverterService = new TimeConverterService();
+
+        return List.of(
+            new ExitCommand(output),
+            new HelpCommand(output),
+            new TimeConversionCommand(timeParser, timeConverterService, output)
+        ).stream()
+         .sorted(Comparator.comparingInt(Command::getPriority))
+         .collect(Collectors.toList());
     }
 
     public void run() {
+        log.info("Starting main application loop");
         try (Scanner scanner = new Scanner(System.in)) {
             output.showWelcome();
 
             while (true) {
                 String input = output.readInput(scanner);
-
-                if (input.isEmpty()) continue;
-                if (exitCommands.contains(input.toLowerCase())) {
-                    output.showExit();
-                    break;
+                if (input.isEmpty()) {
+                    log.trace("Empty input received, skipping");
+                    continue;
                 }
 
-                processCommand(input);
-                output.showBlankLine();
+                log.debug("Processing user input: '{}'", input);
+                CommandResult result = processCommand(input);
+
+                if (result.shouldShowBlankLine()) {
+                    output.showBlankLine();
+                }
+
+                if (result.shouldExit()) {
+                    log.info("Exit command received, terminating application");
+                    break;
+                }
             }
         }
+        log.debug("Main application loop completed");
     }
 
-    private void processCommand(String input) {
-        commandHandlers.entrySet().stream()
-            .filter(entry -> entry.getKey().test(input))
+    private CommandResult processCommand(String input) {
+        return commands.stream()
+            .filter(command -> {
+                boolean canHandle = command.canHandle(input);
+                if (canHandle) {
+                    log.debug("Command {} will handle input '{}'", command.getClass().getSimpleName(), input);
+                }
+                return canHandle;
+            })
             .findFirst()
-            .ifPresent(entry -> entry.getValue().accept(input));
-    }
-
-    private void convertAndDisplay(String input) {
-        output.showResult(
-            parseTime(input)
-                .map(timeConverterService::convert)
-                .orElse(null)
-        );
-    }
-
-    private Optional<Time> parseTime(String input) {
-        try {
-            return Optional.of(timeParser.parse(input));
-        } catch (IllegalArgumentException e) {
-            output.showError(e.getMessage());
-            return Optional.empty();
-        }
+            .map(command -> command.execute(input))
+            .orElse(CommandResult.continueRunning()); // Should never happen with default handler
     }
 
     public static String getMessage() {
