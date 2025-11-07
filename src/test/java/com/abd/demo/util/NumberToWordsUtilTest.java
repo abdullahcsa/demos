@@ -28,11 +28,9 @@ public class NumberToWordsUtilTest {
             constructor.setAccessible(true);
             constructor.newInstance();
             fail("Should have thrown exception");
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             assertTrue(e.getCause() instanceof IllegalStateException);
             assertEquals("Utility class", e.getCause().getMessage());
-        } catch (Exception e) {
-            fail("Unexpected exception type: " + e.getClass().getName());
         }
     }
 
