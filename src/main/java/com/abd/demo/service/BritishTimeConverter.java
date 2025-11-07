@@ -6,11 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * British English time converter for times with minutes divisible by 5.
  * Handles British-specific phrases like "quarter past", "half past", "midnight", "noon", "o'clock".
- *
  * Uses Strategy Pattern with separate rule classes:
  * - Each conversion rule is encapsulated in its own class
  * - Rules are evaluated by priority order
@@ -33,7 +33,7 @@ public class BritishTimeConverter implements TimeToWordsConverter {
      * Lower priority numbers are evaluated first.
      */
     private List<TimeConversionRule> createRules() {
-        return List.of(
+        return Stream.of(
             new MidnightRule(),
             new NoonRule(),
             new OClockRule(),
@@ -42,7 +42,7 @@ public class BritishTimeConverter implements TimeToWordsConverter {
             new QuarterToRule(),
             new MinutesPastRule(),
             new MinutesToRule()
-        ).stream()
+        )
          .sorted(Comparator.comparingInt(TimeConversionRule::getPriority))
          .collect(Collectors.toList());
     }
@@ -58,7 +58,7 @@ public class BritishTimeConverter implements TimeToWordsConverter {
     public String convert(Time time) {
         log.debug("Converting time: {}", time);
 
-        String result = rules.stream()
+        return rules.stream()
             .filter(rule -> {
                 boolean matches = rule.canHandle(time);
                 if (matches) {
@@ -76,7 +76,5 @@ public class BritishTimeConverter implements TimeToWordsConverter {
                 log.error("No rule matched for time: {}", time);
                 return new IllegalStateException("No rule matched for time: " + time);
             });
-
-        return result;
     }
 }

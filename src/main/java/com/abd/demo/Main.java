@@ -10,16 +10,15 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Main application entry point.
  * Orchestrates the CLI application using DDD Hexagonal Architecture + Strategy Pattern.
- *
  * Layers:
  * - Adapter Layer: OutputAdapter (port), ConsoleAdapter (adapter implementation)
  * - Application Layer: Command implementations (application services)
  * - Domain Layer: Time (core business logic)
- *
  * Follows Open/Closed Principle - new commands can be added without modifying this class.
  */
 @Slf4j
@@ -57,12 +56,12 @@ public class Main {
         TimeParser timeParser = new TimeParser();
         TimeConverterService timeConverterService = new TimeConverterService();
 
-        return List.of(
+        return Stream.of(
             new ExitCommand(output),
             new HelpCommand(output),
             new ConfigCommand(output),
             new TimeConversionCommand(timeParser, timeConverterService, output)
-        ).stream()
+        )
          .sorted(Comparator.comparingInt(Command::getPriority))
          .collect(Collectors.toList());
     }

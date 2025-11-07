@@ -7,11 +7,11 @@ import lombok.extern.slf4j.Slf4j;
  * Application configuration singleton.
  * Manages runtime configuration settings for the application.
  */
+@Getter
 @Slf4j
 public class AppConfig {
     private static final AppConfig INSTANCE = new AppConfig();
 
-    @Getter
     private boolean consoleLogsEnabled;
 
     private AppConfig() {

@@ -6,6 +6,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import org.slf4j.LoggerFactory;
 
+import static ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME;
+
 /**
  * Utility class to dynamically configure logging behavior.
  * Allows enabling/disabling console logging at runtime by detaching/attaching the console appender.
@@ -22,7 +24,7 @@ public class LoggerConfigUtil {
      */
     public static void setConsoleLoggingEnabled(boolean enabled) {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger rootLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
+        Logger rootLogger = loggerContext.getLogger(ROOT_LOGGER_NAME);
 
         if (enabled) {
             // Enable: Attach console appender if not already attached
@@ -45,7 +47,7 @@ public class LoggerConfigUtil {
      */
     public static void initializeConsoleLogging() {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger rootLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
+        Logger rootLogger = loggerContext.getLogger(ROOT_LOGGER_NAME);
 
         // Cache the console appender reference
         consoleAppenderCache = rootLogger.getAppender(CONSOLE_APPENDER_NAME);

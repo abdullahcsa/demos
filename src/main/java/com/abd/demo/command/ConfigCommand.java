@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Command to handle configuration changes.
  * Single Responsibility: Handle configuration-related commands.
- *
  * Usage:
  *   config logs enable   - Enable console logging
  *   config logs disable  - Disable console logging
